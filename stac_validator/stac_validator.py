@@ -123,6 +123,15 @@ class StacValidate:
                 logging.debug("Gathering STAC specs from remote.")
                 url = getattr(StacVersion, f"{spec_name}_schema_url")
                 spec = requests.get(url(self.stac_version)).json()
+
+                # Remove link requirement
+                try:
+                    del(spec['definitions']['link'])
+                    del(spec['definitions']['core']['allOf'][1]['required'][2])
+                except:
+                    pass
+
+
                 valid_dir = True
             except Exception as error:
                 logger.exception("STAC Download Error")
@@ -181,7 +190,6 @@ class StacValidate:
         :param stac_schema of STAC (item, catalog, collection)
         :return: validation message
         """
-
         try:
             if "title" in stac_schema and "item" in stac_schema["title"].lower():
                 logger.debug("Changing GeoJson definition to reference local file")
